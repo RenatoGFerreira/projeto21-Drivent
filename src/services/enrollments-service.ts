@@ -1,6 +1,6 @@
 import { Address, Enrollment } from '@prisma/client';
 import { request } from '@/utils/request';
-import { notFoundError } from '@/errors';
+import { invalidDataError, notFoundError } from '@/errors';
 import { addressRepository, CreateAddressParams, enrollmentRepository, CreateEnrollmentParams } from '@/repositories';
 import { exclude } from '@/utils/prisma-utils';
 import { ViaCepAPIError, ViaCepAdressResponse } from '@/protocols';
@@ -10,12 +10,12 @@ async function getAddressFromCEP(cep: string) {
 
   // TODO: Tratar regras de negócio e lanças eventuais erros
   if (!result.data) {
-    throw notFoundError();
+    throw invalidDataError('Cep invalid');
   }
   const response = result.data as ViaCepAPIError;
   if (response.erro) {
     // return response;
-    throw notFoundError();
+    throw invalidDataError('Not found error');
   }
   // FIXME: não estamos interessados em todos os campos
 
