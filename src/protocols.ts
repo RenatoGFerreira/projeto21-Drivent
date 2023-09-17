@@ -35,3 +35,7 @@ export type ViaCepAdressResponse = {
   ddd: string;
   siafi: string;
 };
+
+export type Cep = {
+  cep: string;
+};

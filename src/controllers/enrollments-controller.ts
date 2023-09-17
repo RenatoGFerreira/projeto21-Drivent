@@ -2,6 +2,7 @@ import { Response } from 'express';
 import httpStatus from 'http-status';
 import { AuthenticatedRequest } from '@/middlewares';
 import { enrollmentsService } from '@/services';
+import { Cep } from '@/protocols';
 
 export async function getEnrollmentByUser(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
@@ -19,10 +20,6 @@ export async function postCreateOrUpdateEnrollment(req: AuthenticatedRequest, re
 
   return res.sendStatus(httpStatus.OK);
 }
-
-type Cep = {
-  cep: string;
-};
 
 // TODO - Receber o CEP do usuário por query params.
 export async function getAddressFromCEP(req: AuthenticatedRequest, res: Response) {
