@@ -8,16 +8,13 @@ import { ViaCepAPIError, ViaCepAdressResponse } from '@/protocols';
 async function getAddressFromCEP(cep: string) {
   const result = await request.get(`${process.env.VIA_CEP_API}/${cep}/json/`);
 
-  // TODO: Tratar regras de negócio e lanças eventuais erros
   if (!result.data) {
     throw invalidDataError('Cep invalid');
   }
   const response = result.data as ViaCepAPIError;
   if (response.erro) {
-    // return response;
     throw invalidDataError('Not found error');
   }
-  // FIXME: não estamos interessados em todos os campos
 
   const location = result.data as ViaCepAdressResponse;
   return {
@@ -58,7 +55,6 @@ async function createOrUpdateEnrollmentWithAddress(params: CreateOrUpdateEnrollm
   enrollment.birthday = new Date(enrollment.birthday);
   const address = getAddressForUpsert(params.address);
 
-  // TODO - Verificar se o CEP é válido antes de associar ao enrollment.
   await getAddressFromCEP(address.cep);
   const newEnrollment = await enrollmentRepository.upsert(params.userId, enrollment, exclude(enrollment, 'userId'));
 
