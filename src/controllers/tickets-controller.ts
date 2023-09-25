@@ -18,7 +18,7 @@ export async function getTicket(req: AuthenticatedRequest, res: Response) {
     const ticket = await ticketService.getTicketByUserId(userId);
     return res.send(ticket);
   } catch (error) {
-    return res.sendStatus(httpStatus.BAD_REQUEST);
+    return res.sendStatus(httpStatus.NOT_FOUND);
   }
 }
 
@@ -28,7 +28,7 @@ export async function createTicket(req: AuthenticatedRequest, res: Response) {
 
   try {
     const ticket = await ticketService.createTicket(userId, ticketTypeId);
-    return res.send(ticket);
+    return res.send(ticket).status(httpStatus.CREATED);
   } catch (error) {
     return res.sendStatus(httpStatus.NOT_FOUND);
   }

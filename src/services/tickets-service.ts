@@ -1,5 +1,5 @@
 import { TicketStatus } from '@prisma/client';
-import enrollmentRepository from '@/repositories/enrollments-repository';
+import { enrollmentRepository } from '@/repositories/enrollments-repository';
 import ticketsRepository from '@/repositories/tickets-repository';
 import { notFoundError } from '@/errors';
 import { CreateTicketParams } from '@/protocols';
