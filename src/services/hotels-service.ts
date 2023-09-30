@@ -14,11 +14,23 @@ async function listHotels(userId: number) {
   if (!enrollment) throw notFoundError();
 
   const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
+
   if (!ticket || ticket.status === 'RESERVED' || !ticket.TicketType.includesHotel || ticket.TicketType.isRemote) {
     throw cannotListHotelsError();
   }
 }
 
+async function getHotelsWithRooms(userId: number, hotelId: number) {
+  await listHotels(userId);
+  const hotel = await hotelRepository.roomsByHotelId(hotelId);
+  if (!hotel) {
+    throw notFoundError();
+  }
+
+  return hotel;
+}
+
 export const hotelsService = {
   getHotels,
+  getHotelsWithRooms,
 };
