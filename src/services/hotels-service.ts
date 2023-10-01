@@ -15,7 +15,11 @@ async function listHotels(userId: number) {
 
   const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
 
-  if (!ticket || ticket.status === 'RESERVED' || !ticket.TicketType.includesHotel || ticket.TicketType.isRemote) {
+  if (!ticket) {
+    throw notFoundError();
+  }
+
+  if (ticket.status === 'RESERVED' || !ticket.TicketType.includesHotel || ticket.TicketType.isRemote) {
     throw cannotListHotelsError();
   }
 }
