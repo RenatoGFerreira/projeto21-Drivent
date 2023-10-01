@@ -7,6 +7,8 @@ export async function getHotels(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
   try {
     const hotels = await hotelsService.getHotels(userId);
+    if (!hotels) return res.status(404).send('Not Found Hotels');
+
     return res.status(200).send(hotels);
   } catch (error) {
     if (error.name === 'NotFoundError') {
@@ -33,6 +35,6 @@ export async function getHotelsWithRooms(req: AuthenticatedRequest, res: Respons
       return res.sendStatus(httpStatus.PAYMENT_REQUIRED);
     }
 
-    return res.sendStatus(httpStatus.BAD_REQUEST);
+    return res.status(402).send('Sorry, ERROR 402');
   }
 }
