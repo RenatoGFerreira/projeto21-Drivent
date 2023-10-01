@@ -1,5 +1,7 @@
 import { notFoundError } from '@/errors';
-import { cannotListHotelsError } from '@/errors/cannot-list-hotels';
+import { ticketHotel } from '@/errors/ticket-hotel';
+import { ticketRemote } from '@/errors/ticket-remote';
+import { ticketReserved } from '@/errors/ticket-reserved';
 import { enrollmentRepository, ticketsRepository } from '@/repositories';
 import hotelRepository from '@/repositories/hotel-repository';
 
@@ -18,10 +20,11 @@ async function listHotels(userId: number) {
   if (!ticket) {
     throw notFoundError();
   }
+  if (ticket.status === 'RESERVED') throw ticketReserved();
 
-  if (ticket.status === 'RESERVED' || !ticket.TicketType.includesHotel || ticket.TicketType.isRemote) {
-    throw cannotListHotelsError();
-  }
+  if (!ticket.TicketType.includesHotel) throw ticketHotel();
+
+  if (ticket.TicketType.isRemote) throw ticketRemote();
 }
 
 async function getHotelsWithRooms(userId: number, hotelId: number) {
