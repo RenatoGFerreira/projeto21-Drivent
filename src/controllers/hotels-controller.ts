@@ -7,7 +7,7 @@ export async function getHotels(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
   try {
     const hotels = await hotelsService.getHotels(userId);
-    if (!hotels) return res.status(404).send('Not Found Hotels');
+    if (!hotels || hotels.length === 0) return res.status(404).send('Not Found Hotels.');
 
     return res.status(200).send(hotels);
   } catch (error) {
