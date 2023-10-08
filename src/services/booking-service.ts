@@ -1,7 +1,7 @@
 import { TicketStatus } from '@prisma/client';
 import { notFoundError } from '@/errors';
 import { cannotListHotelsError } from '@/errors/cannot-list-hotels-error';
-import { enrollmentRepository, hotelRepository, ticketsRepository } from '@/repositories';
+import { enrollmentRepository, bookingRepository, ticketsRepository } from '@/repositories';
 
 async function validateUserBooking(userId: number) {
   const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
@@ -20,10 +20,10 @@ async function validateUserBooking(userId: number) {
 async function getBooking(userId: number) {
   await validateUserBooking(userId);
 
-  const hotels = await hotelRepository.findHotels();
-  if (hotels.length === 0) throw notFoundError();
+  const booking = await bookingRepository.findBooking();
+  if (booking.length === 0) throw notFoundError();
 
-  return hotels;
+  return booking;
 }
 
 export const bookingService = {
