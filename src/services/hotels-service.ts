@@ -1,40 +1,40 @@
-import { notFoundError } from '@/errors';
-import { ticketHotel } from '@/errors/ticket-hotel';
-import { ticketRemote } from '@/errors/ticket-remote';
-import { ticketReserved } from '@/errors/ticket-reserved';
-import { enrollmentRepository, ticketsRepository } from '@/repositories';
-import hotelRepository from '@/repositories/hotel-repository';
+import { TicketStatus } from '@prisma/client';
+import { invalidDataError, notFoundError } from '@/errors';
+import { cannotListHotelsError } from '@/errors/cannot-list-hotels-error';
+import { enrollmentRepository, hotelRepository, ticketsRepository } from '@/repositories';
 
-async function getHotels(userId: number) {
-  await listHotels(userId);
-  const hotels = await hotelRepository.findHotels();
-  return hotels;
-}
-
-async function listHotels(userId: number) {
+async function validateUserBooking(userId: number) {
   const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
   if (!enrollment) throw notFoundError();
 
   const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
+  if (!ticket) throw notFoundError();
 
-  if (!ticket) {
-    throw notFoundError();
+  const type = ticket.TicketType;
+
+  if (ticket.status === TicketStatus.RESERVED || type.isRemote || !type.includesHotel) {
+    throw cannotListHotelsError();
   }
-  if (ticket.status === 'RESERVED') throw ticketReserved();
+}
 
-  if (!ticket.TicketType.includesHotel) throw ticketHotel();
+async function getHotels(userId: number) {
+  await validateUserBooking(userId);
 
-  if (ticket.TicketType.isRemote) throw ticketRemote();
+  const hotels = await hotelRepository.findHotels();
+  if (hotels.length === 0) throw notFoundError();
+
+  return hotels;
 }
 
 async function getHotelsWithRooms(userId: number, hotelId: number) {
-  await listHotels(userId);
-  const hotel = await hotelRepository.roomsByHotelId(hotelId);
-  if (!hotel) {
-    throw notFoundError();
-  }
+  await validateUserBooking(userId);
 
-  return hotel;
+  if (!hotelId || isNaN(hotelId)) throw invalidDataError('hotelId');
+
+  const hotelWithRooms = await hotelRepository.findRoomsByHotelId(hotelId);
+  if (!hotelWithRooms) throw notFoundError();
+
+  return hotelWithRooms;
 }
 
 export const hotelsService = {
